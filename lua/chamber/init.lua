@@ -201,6 +201,7 @@ M.pick_service = function(opts)
 					local selection = actions_state.get_selected_entry()
 					actions.close(prompt_bufnr)
 					M.opts.aws.service = selection.value
+					M.pick_key_value(opts)
 				end)
 
 				return true
@@ -273,8 +274,7 @@ M.pick_key_value = function(opts)
 				map("i", "<CR>", function()
 					local selection = actions_state.get_selected_entry()
 					actions.close(prompt_bufnr)
-					print(selection)
-					-- paste to current buffer
+					vim.api.nvim_put({ selection.value }, "c", true, true)
 				end)
 
 				return true

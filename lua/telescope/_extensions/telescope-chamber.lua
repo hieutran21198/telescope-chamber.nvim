@@ -8,6 +8,8 @@ local chamber = require("chamber")
 return telescope.register({
 	setup = chamber.setup,
 	exports = {
-		pick_profile = chamber.pick_profile,
+		chamber_profiles = chamber.pick_profile,
+		chamber_regions = chamber.pick_region,
+		chamber_services = chamber.pick_service,
 	},
 })
