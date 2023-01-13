@@ -42,9 +42,9 @@ Some simple pickers that make life of developer to be easier.
 
 ## To do:
 
-- [x] Set AWS profiles & regions
-- [x] Render list of services and get `key=value` inside
-- [ ] Asynchronous to load profiles and regions on setup
-- [ ] Support `AWS_VAULT`
+- [x] Set AWS profiles & regions.
+- [x] Render list of services and get `key=value` inside.
+- [ ] Asynchronous to load profiles and regions on setup.
+- [ ] Support `AWS_VAULT`.
 - [ ] Write contents to file.
 - [ ] Read content file, show changes and update to chamber.
