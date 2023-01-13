@@ -1,6 +1,6 @@
-# telescope-chamber
+# Telescope Chamber
 
-Chamber env plugin for `neovim`
+Chamber plugin for `neovim`
 
 ## Configuration
 
