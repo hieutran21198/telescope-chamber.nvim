@@ -246,7 +246,6 @@ M.pick_key_value = function(opts)
 		-- trim duplicate spaces
 		v = v:gsub("%s+", " ")
 		local strs = vim.split(v, " ")
-		print(#strs)
 		if #strs == 6 then
 			local key = strs[1]
 			local value = strs[6]
