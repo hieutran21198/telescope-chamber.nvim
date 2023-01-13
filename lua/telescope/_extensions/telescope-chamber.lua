@@ -5,7 +5,7 @@ end
 
 local chamber = require("chamber")
 
-return telescope.register({
+return telescope.register_extension({
 	setup = chamber.setup,
 	exports = {
 		chamber_profiles = chamber.pick_profile,
