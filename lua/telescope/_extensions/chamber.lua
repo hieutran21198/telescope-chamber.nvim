@@ -8,8 +8,7 @@ local chamber = require("chamber")
 return telescope.register_extension({
 	setup = chamber.setup,
 	exports = {
-		profiles = chamber.pick_profile,
-		regions = chamber.pick_region,
-		services = chamber.pick_service,
+		profile = chamber.pick_profile,
+		service = chamber.pick_service,
 	},
 })
