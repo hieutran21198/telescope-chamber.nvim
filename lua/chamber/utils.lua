@@ -1,6 +1,6 @@
 local M = {}
 
----@param content string
+---@param content table
 ---@return string | nil
 M.marshal_json = function(content)
 	local ok, json = pcall(vim.fn.json_encode, content)

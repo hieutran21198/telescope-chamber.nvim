@@ -262,14 +262,15 @@ M.pick_service = function(opts)
 						local region = M.opts.aws.region
 						local profile = M.opts.aws.profile
 
-						local content = utils.get_chamber_content(selection.value, profile, region)
-						if M.opts.json then
-							content = utils.marshal_json(content)
+						local result = M.get_chamber_content(selection.value, profile, region)
 
-							if not content then
-								return
-							end
+						-- if M.opts.json then
+						local content = utils.marshal_json(result)
+
+						if not content then
+							return
 						end
+						-- end
 
 						utils.write_content_to_file(content, input)
 					end)
