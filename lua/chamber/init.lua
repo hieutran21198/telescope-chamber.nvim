@@ -134,6 +134,8 @@ M.get_chamber_content = function(service, profile, region)
 	)
 
 	local results = {}
+
+	local obj_results = {}
 	for _, v in ipairs(key_values) do
 		v = v:gsub("%s+", " ")
 		local strs = vim.split(v, " ")
@@ -141,10 +143,11 @@ M.get_chamber_content = function(service, profile, region)
 			local key = strs[1]
 			local value = strs[6]
 			table.insert(results, key .. "=" .. value)
+			obj_results[key] = value
 		end
 	end
 
-	return results
+	return results, obj_results
 end
 
 M.pick_value = function(opts)
@@ -165,7 +168,7 @@ M.pick_value = function(opts)
 	local actions_state = require("telescope.actions.state")
 	local conf = require("telescope.config").values
 
-	local results = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
+	local results, _ = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
 
 	local title = M.opts.aws.service .. ":" .. M.opts.aws.profile .. ":" .. M.opts.aws.region
 
@@ -262,10 +265,10 @@ M.pick_service = function(opts)
 						local region = M.opts.aws.region
 						local profile = M.opts.aws.profile
 
-						local result = M.get_chamber_content(selection.value, profile, region)
+						local _, obj_result = M.get_chamber_content(selection.value, profile, region)
 
 						-- if M.opts.json then
-						local content = utils.marshal_json(result)
+						local content = utils.marshal_json(obj_result)
 
 						if not content then
 							return
