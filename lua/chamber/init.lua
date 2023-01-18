@@ -154,8 +154,7 @@ M.pick_value = function(opts)
 	end
 
 	if M.opts.aws.service == "" then
-		M.pick_service()
-		return
+		print "Please select a service first"
 	end
 
 	local pickers = require "telescope.pickers"
