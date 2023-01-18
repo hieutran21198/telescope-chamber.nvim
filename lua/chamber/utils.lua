@@ -7,6 +7,11 @@ M.marshal_json = function(content)
 	return ok and json or nil
 end
 
+M.unmarshal_json = function(content)
+	local ok, json = pcall(vim.fn.json_decode, content)
+	return ok and json or nil
+end
+
 ---@param content string
 ---@param path string
 M.write_content_to_file = function(content, path)

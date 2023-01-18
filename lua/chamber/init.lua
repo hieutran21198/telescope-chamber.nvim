@@ -6,7 +6,6 @@ local M = {
 			service = "",
 		},
 		allow_env = true,
-		json = false,
 	},
 
 	regions = {
@@ -36,27 +35,27 @@ M.setup = function(opts)
 	M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})
 
 	if M.opts.allow_env then
-		M.opts.aws.profile = os.getenv("AWS_PROFILE") or "default"
-		M.opts.aws.region = os.getenv("AWS_REGION") or "us-east-1"
+		M.opts.aws.profile = os.getenv "AWS_PROFILE" or "default"
+		M.opts.aws.region = os.getenv "AWS_REGION" or "us-east-1"
 	end
 end
 
 M.pick_region = function(opts)
 	local telescope_ok = pcall(require, "telescope")
 	if not telescope_ok then
-		print("Telescope is not available")
+		print "Telescope is not available"
 		return
 	end
 
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local actions = require("telescope.actions")
-	local actions_state = require("telescope.actions.state")
+	local pickers = require "telescope.pickers"
+	local finders = require "telescope.finders"
+	local actions = require "telescope.actions"
+	local actions_state = require "telescope.actions.state"
 	local conf = require("telescope.config").values
 
 	local region_picker = pickers.new({}, {
 		prompt_title = "Select AWS Region",
-		finder = finders.new_table({
+		finder = finders.new_table {
 			results = M.regions,
 			entry_maker = function(entry)
 				return {
@@ -65,7 +64,7 @@ M.pick_region = function(opts)
 					ordinal = entry,
 				}
 			end,
-		}),
+		},
 		sorter = conf.generic_sorter(opts),
 		attach_mappings = function(prompt_bufnr, map)
 			map("i", "<CR>", function()
@@ -85,20 +84,20 @@ end
 M.pick_profile = function(opts)
 	local telescope_ok = pcall(require, "telescope")
 	if not telescope_ok then
-		print("Telescope is not available")
+		print "Telescope is not available"
 		return
 	end
 
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local actions = require("telescope.actions")
-	local actions_state = require("telescope.actions.state")
+	local pickers = require "telescope.pickers"
+	local finders = require "telescope.finders"
+	local actions = require "telescope.actions"
+	local actions_state = require "telescope.actions.state"
 	local conf = require("telescope.config").values
 
 	local profile_picker = pickers.new({}, {
 		prompt_title = "Select AWS Profile",
-		finder = finders.new_table({
-			results = vim.fn.systemlist("aws configure list-profiles") or {},
+		finder = finders.new_table {
+			results = vim.fn.systemlist "aws configure list-profiles" or {},
 			entry_maker = function(entry)
 				return {
 					value = entry,
@@ -106,7 +105,7 @@ M.pick_profile = function(opts)
 					ordinal = entry,
 				}
 			end,
-		}),
+		},
 		sorter = conf.generic_sorter(opts),
 		attach_mappings = function(prompt_bufnr, map)
 			map("i", "<CR>", function()
@@ -151,30 +150,33 @@ M.get_chamber_content = function(service, profile, region)
 end
 
 M.pick_value = function(opts)
-	-- TODO: Implement
-	-- if M.opts.aws.service == "" or M.opts.aws.profile == "" or M.opts.aws.region == "" then
-	-- 	print("Please select AWS service, profile and region first")
-	-- 	return
-	-- end
+	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
+		M.pick_profile()
+	end
+
+	if M.opts.aws.aws.service == "" then
+		M.pick_service()
+		return
+	end
 	local telescope_ok = pcall(require, "telescope")
 	if not telescope_ok then
-		print("Telescope is not available")
+		print "Telescope is not available"
 		return
 	end
 
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local actions = require("telescope.actions")
-	local actions_state = require("telescope.actions.state")
+	local pickers = require "telescope.pickers"
+	local finders = require "telescope.finders"
+	local actions = require "telescope.actions"
+	local actions_state = require "telescope.actions.state"
 	local conf = require("telescope.config").values
 
-	local results, _ = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
+	local results, obj_results = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
 
 	local title = M.opts.aws.service .. ":" .. M.opts.aws.profile .. ":" .. M.opts.aws.region
 
 	local pick_value = pickers.new({}, {
 		prompt_title = title,
-		finder = finders.new_table({
+		finder = finders.new_table {
 			results = results,
 			entry_maker = function(entry)
 				return {
@@ -183,13 +185,17 @@ M.pick_value = function(opts)
 					ordinal = entry,
 				}
 			end,
-		}),
-		sorter = conf.generic_sorter({}),
+		},
+		sorter = conf.generic_sorter {},
 		attach_mappings = function(prompt_bufnr, map)
 			map("i", "<CR>", function()
 				local selection = actions_state.get_selected_entry()
 				actions.close(prompt_bufnr)
 				vim.api.nvim_put({ selection.value }, "c", true, true)
+			end)
+
+			map("i", "<C-s>", function()
+				M.write_content_to_file(obj_results)
 			end)
 
 			return true
@@ -199,22 +205,85 @@ M.pick_value = function(opts)
 	pick_value:find()
 end
 
+M.write_content_to_file = function(obj_results)
+	vim.ui.input({
+		prompt = "File path: ",
+	}, function(input)
+		local utils = require "chamber.utils"
+
+		if input == "" or not input then
+			print "Please enter a valid file path"
+			return
+		end
+
+		local content = utils.unmarshal_json(obj_results)
+		if not content then
+			return
+		end
+
+		utils.write_content_to_file(content, input)
+	end)
+end
+
+M.load_from_file = function()
+	vim.ui.input({
+		prompt = "Enter file path",
+	}, function(input)
+		local content = vim.fn.readfile(input)
+		if content == nil then
+			print "File not found"
+			return
+		end
+		local utils = require "chamber.utils"
+
+		local obj_results = utils.unmarshal_json(content)
+		if not obj_results then
+			print "Invalid JSON file"
+			return
+		end
+
+		local _, obj_results2 = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
+
+		for k, v in pairs(obj_results) do
+			if obj_results2[k] ~= v then
+				-- run command: chamber write service key value
+				local command = "AWS_REGION="
+					.. M.opts.aws.region
+					.. " "
+					.. "AWS_PROFILE="
+					.. M.opts.aws.profile
+					.. " "
+					.. "chamber write "
+					.. M.opts.aws.service
+					.. " "
+					.. k
+					.. " "
+					.. v
+
+				vim.fn.system(command)
+			end
+		end
+	end)
+
+	M.pick_value()
+end
+
 M.pick_service = function(opts)
 	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
-		print("Please select AWS profile and region first")
+		print "Please select AWS profile and region first"
 		return
 	end
 
 	local telescope_ok = pcall(require, "telescope")
 	if not telescope_ok then
-		print("Telescope is not available")
+		print "Telescope is not available"
 		return
 	end
 
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local actions = require("telescope.actions")
-	local actions_state = require("telescope.actions.state")
+	local pickers = require "telescope.pickers"
+	local finders = require "telescope.finders"
+	local actions = require "telescope.actions"
+	local actions_state = require "telescope.actions.state"
 	local conf = require("telescope.config").values
 
 	local services = vim.fn.systemlist(
@@ -235,7 +304,7 @@ M.pick_service = function(opts)
 
 	local pick_service = pickers.new({}, {
 		prompt_title = M.opts.aws.service ~= "" and " " .. M.opts.aws.service .. " " .. title or title,
-		finder = finders.new_table({
+		finder = finders.new_table {
 			results = services,
 			entry_maker = function(entry)
 				return {
@@ -244,8 +313,8 @@ M.pick_service = function(opts)
 					ordinal = entry,
 				}
 			end,
-		}),
-		sorter = conf.generic_sorter({}),
+		},
+		sorter = conf.generic_sorter {},
 		attach_mappings = function(prompt_bufnr, map)
 			map("i", "<CR>", function()
 				local selection = actions_state.get_selected_entry()
@@ -253,30 +322,11 @@ M.pick_service = function(opts)
 				M.opts.aws.service = selection.value
 
 				if opts.write_to_file then
-					vim.ui.input({
-						prompt = "File path: ",
-					}, function(input)
-						if input == "" or not input then
-							print("Please enter a valid file path")
-							return
-						end
+					local region = M.opts.aws.region
+					local profile = M.opts.aws.profile
+					local _, obj_result = M.get_chamber_content(selection.value, profile, region)
 
-						local utils = require("chamber.utils")
-						local region = M.opts.aws.region
-						local profile = M.opts.aws.profile
-
-						local _, obj_result = M.get_chamber_content(selection.value, profile, region)
-
-						-- if M.opts.json then
-						local content = utils.marshal_json(obj_result)
-
-						if not content then
-							return
-						end
-						-- end
-
-						utils.write_content_to_file(content, input)
-					end)
+					M.write_content_to_file(obj_result)
 				else
 					M.pick_value()
 				end
