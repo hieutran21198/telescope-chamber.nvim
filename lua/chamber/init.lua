@@ -1,3 +1,8 @@
+local telescope_ok = pcall(require, "telescope")
+if not telescope_ok then
+	return
+end
+
 local utils = require "chamber.utils"
 
 local msg = {
@@ -47,12 +52,6 @@ M.setup = function(opts)
 end
 
 M.pick_region = function(opts)
-	local telescope_ok = pcall(require, "telescope")
-	if not telescope_ok then
-		print(msg.err_telescope_not_available)
-		return
-	end
-
 	local pickers = require "telescope.pickers"
 	local finders = require "telescope.finders"
 	local actions = require "telescope.actions"
@@ -88,12 +87,6 @@ M.pick_region = function(opts)
 end
 
 M.pick_profile = function(opts)
-	local telescope_ok = pcall(require, "telescope")
-	if not telescope_ok then
-		print(msg.err_telescope_not_available)
-		return
-	end
-
 	local pickers = require "telescope.pickers"
 	local finders = require "telescope.finders"
 	local actions = require "telescope.actions"
@@ -164,11 +157,6 @@ M.pick_value = function(opts)
 		M.pick_service()
 		return
 	end
-	local telescope_ok = pcall(require, "telescope")
-	if not telescope_ok then
-		print "Telescope is not available"
-		return
-	end
 
 	local pickers = require "telescope.pickers"
 	local finders = require "telescope.finders"
@@ -222,7 +210,7 @@ M.write_content_to_file = function(obj_results)
 
 		print(vim.inspect(obj_results))
 
-		local content = utils.unmarshal_json(obj_results)
+		local content = utils.marshal_json(obj_results)
 		if not content then
 			print "result is nil"
 			return
