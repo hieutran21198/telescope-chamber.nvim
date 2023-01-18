@@ -255,9 +255,9 @@ M.load_from_file = function()
 				vim.fn.system(command)
 			end
 		end
-	end)
 
-	M.pick_value()
+		M.pick_value()
+	end)
 end
 
 M.pick_service = function(opts)
