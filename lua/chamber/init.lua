@@ -218,6 +218,7 @@ M.write_content_to_file = function(obj_results)
 
 		local content = utils.unmarshal_json(obj_results)
 		if not content then
+			print "result is nil"
 			return
 		end
 
