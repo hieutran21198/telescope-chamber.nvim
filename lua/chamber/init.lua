@@ -1,3 +1,9 @@
+local utils = require "chamber.utils"
+
+local msg = {
+	list_aws_profile = "List AWS Profile",
+}
+
 local M = {
 	opts = {
 		aws = {
@@ -43,7 +49,7 @@ end
 M.pick_region = function(opts)
 	local telescope_ok = pcall(require, "telescope")
 	if not telescope_ok then
-		print "Telescope is not available"
+		print(msg.err_telescope_not_available)
 		return
 	end
 
@@ -84,7 +90,7 @@ end
 M.pick_profile = function(opts)
 	local telescope_ok = pcall(require, "telescope")
 	if not telescope_ok then
-		print "Telescope is not available"
+		print(msg.err_telescope_not_available)
 		return
 	end
 
@@ -95,7 +101,7 @@ M.pick_profile = function(opts)
 	local conf = require("telescope.config").values
 
 	local profile_picker = pickers.new({}, {
-		prompt_title = "Select AWS Profile",
+		prompt_title = msg.list_aws_profile,
 		finder = finders.new_table {
 			results = vim.fn.systemlist "aws configure list-profiles" or {},
 			entry_maker = function(entry)
@@ -209,12 +215,12 @@ M.write_content_to_file = function(obj_results)
 	vim.ui.input({
 		prompt = "File path: ",
 	}, function(input)
-		local utils = require "chamber.utils"
-
 		if input == "" or not input then
 			print "Please enter a valid file path"
 			return
 		end
+
+		print(vim.inspect(obj_results))
 
 		local content = utils.unmarshal_json(obj_results)
 		if not content then
@@ -235,7 +241,6 @@ M.load_from_file = function()
 			print "File not found"
 			return
 		end
-		local utils = require "chamber.utils"
 
 		local obj_results = utils.unmarshal_json(content)
 		if not obj_results then
