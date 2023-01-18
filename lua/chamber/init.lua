@@ -153,7 +153,7 @@ M.pick_value = function(opts)
 		M.pick_profile()
 	end
 
-	if M.opts.aws.aws.service == "" then
+	if M.opts.aws.service == "" then
 		M.pick_service()
 		return
 	end
@@ -207,8 +207,6 @@ M.write_content_to_file = function(obj_results)
 			print "Please enter a valid file path"
 			return
 		end
-
-		print(vim.inspect(obj_results))
 
 		local content = utils.marshal_json(obj_results)
 		if not content then
@@ -265,12 +263,6 @@ end
 M.pick_service = function(opts)
 	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
 		print "Please select AWS profile and region first"
-		return
-	end
-
-	local telescope_ok = pcall(require, "telescope")
-	if not telescope_ok then
-		print "Telescope is not available"
 		return
 	end
 
