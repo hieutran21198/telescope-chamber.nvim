@@ -1,5 +1,7 @@
 # Telescope Chamber
 
+# Warning: It is in progress. Do not included it to your Neovim. A release version will be published soon.
+
 Chamber plugin for `neovim`
 
 ## Configuration
