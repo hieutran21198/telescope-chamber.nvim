@@ -148,13 +148,26 @@ M.get_chamber_content = function(service, profile, region)
 	return results, obj_results
 end
 
+---@class PickValueOptions
+---@field on_select_action 'view' | 'save_to_register'
+---@param opts PickValueOptions | nil
 M.pick_value = function(opts)
+	---@type PickValueOptions
+	local default_opts = {
+		on_select_action = "save_to_register",
+	}
+
+	opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+
 	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
 		M.pick_profile()
 	end
 
 	if M.opts.aws.service == "" then
-		print "Please select a service first"
+		M.pick_service {
+			update_service_only = true,
+		}
+		return
 	end
 
 	local pickers = require "telescope.pickers"
@@ -163,7 +176,7 @@ M.pick_value = function(opts)
 	local actions_state = require "telescope.actions.state"
 	local conf = require("telescope.config").values
 
-	local results, obj_results = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
+	local results, _ = M.get_chamber_content(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
 
 	local title = M.opts.aws.service .. ":" .. M.opts.aws.profile .. ":" .. M.opts.aws.region
 
@@ -184,11 +197,12 @@ M.pick_value = function(opts)
 			map("i", "<CR>", function()
 				local selection = actions_state.get_selected_entry()
 				actions.close(prompt_bufnr)
-				vim.api.nvim_put({ selection.value }, "c", true, true)
-			end)
 
-			map("i", "<C-s>", function()
-				M.write_content_to_file(obj_results)
+				if opts.on_select_action == "view" then
+					print(selection.value)
+				elseif opts.on_select_action == "save_to_register" then
+					vim.fn.setreg("+", selection.value)
+				end
 			end)
 
 			return true
@@ -259,7 +273,17 @@ M.load_from_file = function()
 	end)
 end
 
+---@class PickServiceOptions
+---@field on_select_action 'update_service' | 'write_to_file'
+
+---@param opts PickServiceOptions | nil
 M.pick_service = function(opts)
+	---@type PickServiceOptions
+	local default_opts = {
+		on_select_action = "update_service",
+	}
+	opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+
 	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
 		print "Please select AWS profile and region first"
 		return
@@ -306,15 +330,27 @@ M.pick_service = function(opts)
 				actions.close(prompt_bufnr)
 				M.opts.aws.service = selection.value
 
-				if opts.write_to_file then
+				if opts.on_select_action == "update_service" then
+					M.pick_value {
+						action = "save_to_register",
+					}
+					return
+				elseif opts.on_select_action == "write_to_file" then
 					local region = M.opts.aws.region
 					local profile = M.opts.aws.profile
 					local _, obj_result = M.get_chamber_content(selection.value, profile, region)
-
 					M.write_content_to_file(obj_result)
-				else
-					M.pick_value()
 				end
+			end)
+
+			map("i", "<C-s>", function()
+				local selection = actions_state.get_selected_entry()
+				actions.close(prompt_bufnr)
+
+				local region = M.opts.aws.region
+				local profile = M.opts.aws.profile
+				local _, obj_result = M.get_chamber_content(selection.value, profile, region)
+				M.write_content_to_file(obj_result)
 			end)
 
 			return true

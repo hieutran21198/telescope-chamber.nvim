@@ -34,6 +34,8 @@ telescope.setup(options)
 
 ## Pickers
 
+<img src="./assets/user-stories/US1" alt="User case 1" />
+
 Some simple pickers that make life of developer to be easier.
 
 | Name       | Command                      | Description                                 |
