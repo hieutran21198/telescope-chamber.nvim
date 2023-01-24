@@ -208,11 +208,6 @@ M.pick_service = function(opts)
 	local default_opts = {}
 	opts = vim.tbl_deep_extend("force", default_opts, opts or {})
 
-	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
-		print "Please select AWS profile and region first"
-		return
-	end
-
 	local services = vim.fn.systemlist(
 		"AWS_REGION="
 			.. M.opts.aws.region
@@ -230,7 +225,7 @@ M.pick_service = function(opts)
 	local title = M.opts.aws.profile .. ":" .. M.opts.aws.region
 
 	local pick_service = pickers.new({}, {
-		prompt_title = M.opts.aws.service ~= "" and " " .. M.opts.aws.service .. " " .. title or title,
+		prompt_title = M.opts.aws.service and " " .. M.opts.aws.service .. " " .. title or title,
 		finder = finders.new_table {
 			results = services,
 			entry_maker = function(entry)
