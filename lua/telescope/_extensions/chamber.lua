@@ -11,6 +11,6 @@ return telescope.register_extension {
 		profile = chamber.pick_profile,
 		service = chamber.pick_service,
 		load = chamber.load_from_file,
-		value = chamber.pick_value,
+		value = chamber.pick_variable,
 	},
 }
