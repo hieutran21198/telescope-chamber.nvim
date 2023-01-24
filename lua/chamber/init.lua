@@ -323,64 +323,62 @@ M.get_env_variables = function(service, profile, region)
 	return results, tbl_result
 end
 
--- ---@class PickValueOptions
--- ---@field on_select_action 'view' | 'save_to_register'
--- ---@param opts PickValueOptions | nil
--- M.pick_variable = function(opts)
--- 	---@type PickValueOptions
--- 	local default_opts = {
--- 		on_select_action = "save_to_register",
--- 	}
---
--- 	opts = vim.tbl_deep_extend("force", default_opts, opts or {})
---
--- 	if M.opts.aws.profile == "" or M.opts.aws.region == "" then
--- 		M.pick_profile()
--- 	end
---
--- 	if M.opts.aws.service == "" then
--- 		M.pick_service {
--- 			update_service_only = true,
--- 		}
--- 		return
--- 	end
---
--- 	local results, _ = M.get_env_variables(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
---
--- 	local title = M.opts.aws.service .. ":" .. M.opts.aws.profile .. ":" .. M.opts.aws.region
---
--- 	local pick_value = pickers.new({}, {
--- 		prompt_title = title,
--- 		finder = finders.new_table {
--- 			results = results,
--- 			entry_maker = function(entry)
--- 				return {
--- 					value = entry,
--- 					display = entry,
--- 					ordinal = entry,
--- 				}
--- 			end,
--- 		},
--- 		sorter = conf.generic_sorter {},
--- 		attach_mappings = function(prompt_bufnr, map)
--- 			map("i", "<CR>", function()
--- 				local selection = actions_state.get_selected_entry()
--- 				actions.close(prompt_bufnr)
---
--- 				if opts.on_select_action == "view" then
--- 					print(selection.value)
--- 				elseif opts.on_select_action == "save_to_register" then
--- 					vim.fn.setreg("+", selection.value)
--- 				end
--- 			end)
---
--- 			return true
--- 		end,
--- 	})
---
--- 	pick_value:find()
--- end
---
+M.able_to_pick_variable = function()
+	return M.opts.aws.service and M.opts.aws.profile and M.opts.aws.region
+end
+
+---@class PickValueOptions
+---@field on_select_action 'view' | 'save_to_register'
+---@param opts PickValueOptions | nil
+M.pick_variable = function(opts)
+	---@type PickValueOptions
+	local default_opts = {
+		on_select_action = "save_to_register",
+	}
+
+	opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+
+	if M.opts.aws.service == "" then
+		print "Please select service first"
+		return
+	end
+
+	local results, _ = M.get_env_variables(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
+
+	local title = M.opts.aws.service .. ":" .. M.opts.aws.profile .. ":" .. M.opts.aws.region
+
+	local pick_value = pickers.new({}, {
+		prompt_title = title,
+		finder = finders.new_table {
+			results = results,
+			entry_maker = function(entry)
+				return {
+					value = entry,
+					display = entry,
+					ordinal = entry,
+				}
+			end,
+		},
+		sorter = conf.generic_sorter {},
+		attach_mappings = function(prompt_bufnr, map)
+			map("i", "<CR>", function()
+				local selection = actions_state.get_selected_entry()
+				actions.close(prompt_bufnr)
+
+				if opts.on_select_action == "view" then
+					print(selection.value)
+				elseif opts.on_select_action == "save_to_register" then
+					vim.fn.setreg("+", selection.value)
+				end
+			end)
+
+			return true
+		end,
+	})
+
+	pick_value:find()
+end
+
 M.write_service_variables = function(obj_results)
 	vim.ui.input({
 		prompt = "File path: ",
