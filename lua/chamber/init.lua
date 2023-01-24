@@ -109,6 +109,8 @@ M.pick_region = function(opts)
 					actions.close(prompt_bufnr)
 
 					M.opts.aws.region = selection.value
+
+					print("selected " .. selection.value .. " region.")
 				end
 
 				if opts.on_confirm then
@@ -159,6 +161,8 @@ M.pick_profile = function(opts)
 					actions.close(prompt_bufnr)
 
 					M.opts.aws.profile = selection.value
+					print("Selected " .. selection.value .. " profile.")
+
 					if opts.pick_region then
 						M.pick_region(opts.pick_region_opts)
 					end
