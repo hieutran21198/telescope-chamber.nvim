@@ -34,6 +34,10 @@ local default_plugin_opts = {
 			mode = "i",
 			key = "<C-S>",
 		},
+		re_select_profile = {
+			mode = "i",
+			key = "<C-r>",
+		},
 		pull_variables = {
 			mode = "i",
 			key = "<C-p>",
@@ -270,6 +274,21 @@ M.pick_service = function(opts)
 				end
 
 				map(mappings.save_to_file.mode, mappings.save_to_file.key, save_to_file_handler)
+			end
+
+			if mappings.re_select_profile then
+				local re_select_profile_handler = function()
+					M.pick_profile {
+						pick_region = true,
+						pick_region_opts = {
+							on_confirm = function(on_confirm_opts)
+								on_confirm_opts.default_handler()
+								M.pick_service(opts)
+							end,
+						},
+					}
+				end
+				map(mappings.re_select_profile.mode, mappings.re_select_profile.key, re_select_profile_handler)
 			end
 
 			return true
