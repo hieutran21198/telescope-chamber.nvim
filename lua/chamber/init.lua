@@ -189,7 +189,7 @@ end
 
 ---@param opts PickServiceOptions
 M.pick_service = function(opts)
-	if not M.opts.aws.region or M.opts.aws.profile then
+	if not M.opts.aws.region or not M.opts.aws.profile then
 		M.pick_profile {
 			pick_region = true,
 			pick_region_opts = {
