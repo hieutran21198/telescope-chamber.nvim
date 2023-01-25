@@ -364,9 +364,7 @@ M.pick_variable = function(opts)
 			map("i", "<CR>", function()
 				local selection = actions_state.get_selected_entry()
 				actions.close(prompt_bufnr)
-				local lnum = vim.fn.line "." + 1
-				vim.fn.append(lnum, selection.value)
-				vim.fn.append(lnum + 1, "")
+				vim.fn.append(vim.fn.bufnr(), selection.value)
 			end)
 
 			return true
