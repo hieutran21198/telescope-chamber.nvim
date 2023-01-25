@@ -366,16 +366,19 @@ M.pick_variable = function(opts)
 				mappings = default_plugin_opts.mappings
 			end
 
-			if mappings.confirm then
-				map(mappings.confirm.mode, mappings.confirm.key, function()
-					local selection = actions_state.get_selected_entry()
-					actions.close(prompt_bufnr)
-					local failed = vim.fn.append(vim.fn.bufnr(), selection.value)
-					if failed == 0 then
-						print "Failed to append to buffer"
-					end
-				end)
-			end
+			actions.select_default:replace(function()
+				local selection = actions_state.get_selected_entry()
+				actions.close(prompt_bufnr)
+				vim.fn.setreg("a", selection.value)
+			end)
+
+			-- if mappings.confirm then
+			-- 	map(mappings.confirm.mode, mappings.confirm.key, function()
+			-- 		local selection = actions_state.get_selected_entry()
+			-- 		actions.close(prompt_bufnr)
+			-- 		vim.fn.setreg("a", selection.value)
+			-- 	end)
+			-- end
 
 			return true
 		end,
@@ -402,52 +405,5 @@ M.write_service_variables = function(obj_results)
 		utils.write_content_to_file(content, input)
 	end)
 end
---
--- M.load_from_file = function()
--- 	vim.ui.input({
--- 		prompt = "Enter file path",
--- 	}, function(input)
--- 		local content = vim.fn.readfile(input)
--- 		if content == nil then
--- 			print "File not found"
--- 			return
--- 		end
---
--- 		local obj_results = utils.unmarshal_json(content)
--- 		if not obj_results then
--- 			print "Invalid JSON file"
--- 			return
--- 		end
---
--- 		local _, obj_results2 = M.get_env_variables(M.opts.aws.service, M.opts.aws.profile, M.opts.aws.region)
---
--- 		for k, v in pairs(obj_results) do
--- 			if obj_results2[k] ~= v then
--- 				-- run command: chamber write service key value
--- 				local command = "AWS_REGION="
--- 					.. M.opts.aws.region
--- 					.. " "
--- 					.. "AWS_PROFILE="
--- 					.. M.opts.aws.profile
--- 					.. " "
--- 					.. "chamber write "
--- 					.. M.opts.aws.service
--- 					.. " "
--- 					.. k
--- 					.. " "
--- 					.. v
---
--- 				vim.fn.system(command)
--- 			end
--- 		end
---
--- 		M.pick_variable()
--- 	end)
--- end
-
----@class PickServiceOptions
----@field on_select_action 'update_service' | 'write_to_file'
-
----@param opts PickServiceOptions | nil
 
 return M
