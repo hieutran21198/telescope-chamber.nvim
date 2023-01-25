@@ -361,11 +361,21 @@ M.pick_variable = function(opts)
 		},
 		sorter = conf.generic_sorter {},
 		attach_mappings = function(prompt_bufnr, map)
-			map("i", "<CR>", function()
-				local selection = actions_state.get_selected_entry()
-				actions.close(prompt_bufnr)
-				vim.fn.append(vim.fn.bufnr(), selection.value)
-			end)
+			local mappings = M.opts.mappings
+			if not mappings then
+				mappings = default_plugin_opts.mappings
+			end
+
+			if M.opts.mappings.confirm then
+				map(mappings.confirm.mode, mappings.confirm.key, function()
+					local selection = actions_state.get_selected_entry()
+					actions.close(prompt_bufnr)
+					local failed = vim.fn.append(vim.fn.bufnr(), selection.value)
+					if failed == 0 then
+						print "Failed to append to buffer"
+					end
+				end)
+			end
 
 			return true
 		end,
