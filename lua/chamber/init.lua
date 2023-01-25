@@ -366,7 +366,7 @@ M.pick_variable = function(opts)
 				mappings = default_plugin_opts.mappings
 			end
 
-			if M.opts.mappings.confirm then
+			if mappings.confirm then
 				map(mappings.confirm.mode, mappings.confirm.key, function()
 					local selection = actions_state.get_selected_entry()
 					actions.close(prompt_bufnr)
