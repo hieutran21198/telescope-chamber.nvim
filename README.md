@@ -1,54 +1,25 @@
 # Telescope Chamber
 
-# Warning: It is in progress. Do not included it to your Neovim. A release version will be published soon.
+Telescope Chamber is a plugin that supported chamber tool for storing secrets.
 
-Chamber plugin for `neovim`
+## Prerequisites:
 
-## Configuration
+- [AWS CLI version >= 2](https://aws.amazon.com/cli)
+- [Chamber CLI](https://github.com/segmentio/chamber)
+- [Telescope Plugin](https://github.com/nvim-telescope/telescope.nvim)
 
-Default configuration of `telescope-chamber`.
+## Commands
 
-```lua
-local options = {
-  -- another options here
-	extensions = {
-		["chamber"] = {
-			aws = {
-				profile = "default",
-				region = "ap-southeast-1",
-				service = "",
-			},
-			-- if use_cached_profiles == true, list profiles and regions will be
-			-- loaded at setup scenerio instead.
-			use_cached_profiles = false,
-      -- if load_from_env == true, it will load profiles and regions from
-      -- environment and override the opts.aws.profile & opts.aws.region
-      -- configuration.
-			load_from_env = false,
-		},
-	},
-}
+| Command                             | Description                                  |
+| ----------------------------------- | -------------------------------------------- |
+| telescope.extension.chamber.region  | select one of supported regions              |
+| telescope.extension.chamber.profile | select an AWS profile                        |
+| telescope.extension.chamber.service | select an AWS service to get list of secrets |
+| telescope.extension.chamber.secret  | select a secret and append to current line   |
 
-telescope.setup(options)
-```
+## To-dos
 
-## Pickers
-
-<img src="./assets/user-stories/US1" alt="User case 1" />
-
-Some simple pickers that make life of developer to be easier.
-
-| Name       | Command                      | Description                                 |
-| ---------- | ---------------------------- | ------------------------------------------- |
-| `profiles` | `Telescope chamber profiles` | Set AWS profile                             |
-| `regions`  | `Telescope chamber regions`  | Set AWS regions                             |
-| `services` | `Telescope chamber services` | Set service and get key=value from service. |
-
-## To do:
-
-- [x] Set AWS profiles & regions.
-- [x] Render list of services and get `key=value` inside.
-- [ ] Asynchronous to load profiles and regions on setup.
-- [ ] Support `AWS_VAULT`.
-- [ ] Write contents to file.
-- [ ] Read content file, show changes and update to chamber.
+- [x] Get secret of a service by profile and region.
+- [x] Write secrets of a service to a file.
+- [ ] Support AWS Vault for authenticating.
+- ...

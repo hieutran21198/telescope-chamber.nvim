@@ -253,7 +253,7 @@ M.pick_service = function(opts)
 					actions.close(prompt_bufnr)
 					M.opts.aws.service = selection.value
 
-					M.pick_variable {}
+					M.pick_secret {}
 				end
 
 				map(mappings.confirm.mode, mappings.confirm.key, confirm_handler)
@@ -327,14 +327,11 @@ M.can_pick_variable = function()
 	return M.opts.aws.service and M.opts.aws.profile and M.opts.aws.region
 end
 
----@class PickValueOptions
----@field on_select_action 'view' | 'save_to_register'
----@param opts PickValueOptions | nil
-M.pick_variable = function(opts)
-	---@type PickValueOptions
-	local default_opts = {
-		on_select_action = "save_to_register",
-	}
+---@class PickSecretOptions
+---@param opts PickSecretOptions | nil
+M.pick_secret = function(opts)
+	---@type PickSecretOptions
+	local default_opts = {}
 
 	opts = vim.tbl_deep_extend("force", default_opts, opts or {})
 
