@@ -366,19 +366,14 @@ M.pick_variable = function(opts)
 				mappings = default_plugin_opts.mappings
 			end
 
-			actions.select_default:replace(function()
-				local selection = actions_state.get_selected_entry()
-				actions.close(prompt_bufnr)
-				vim.fn.setreg("a", selection.value)
-			end)
+			if mappings.confirm then
+				map(mappings.confirm.mode, mappings.confirm.key, function()
+					local selection = actions_state.get_selected_entry()
+					actions.close(prompt_bufnr)
 
-			-- if mappings.confirm then
-			-- 	map(mappings.confirm.mode, mappings.confirm.key, function()
-			-- 		local selection = actions_state.get_selected_entry()
-			-- 		actions.close(prompt_bufnr)
-			-- 		vim.fn.setreg("a", selection.value)
-			-- 	end)
-			-- end
+					vim.api.nvim_put({ selection.value }, "b", true, true)
+				end)
+			end
 
 			return true
 		end,
