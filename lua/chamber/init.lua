@@ -323,7 +323,7 @@ M.get_env_variables = function(service, profile, region)
 	return results, tbl_result
 end
 
-M.able_to_pick_variable = function()
+M.can_pick_variable = function()
 	return M.opts.aws.service and M.opts.aws.profile and M.opts.aws.region
 end
 
@@ -364,12 +364,9 @@ M.pick_variable = function(opts)
 			map("i", "<CR>", function()
 				local selection = actions_state.get_selected_entry()
 				actions.close(prompt_bufnr)
-
-				if opts.on_select_action == "view" then
-					print(selection.value)
-				elseif opts.on_select_action == "save_to_register" then
-					vim.fn.setreg("+", selection.value)
-				end
+				local lnum = vim.fn.line "." + 1
+				vim.fn.append(lnum, selection.value)
+				vim.fn.append(lnum + 1, "")
 			end)
 
 			return true

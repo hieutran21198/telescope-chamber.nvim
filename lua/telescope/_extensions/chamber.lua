@@ -12,6 +12,6 @@ return telescope.register_extension {
 		profile = chamber.pick_profile,
 		service = chamber.pick_service,
 		variable = chamber.pick_variable,
-		able_to_pick_variable = chamber.able_to_pick_variable,
+		can_pick_variable = chamber.can_pick_variable,
 	},
 }
